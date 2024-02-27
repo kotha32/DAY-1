@@ -78,26 +78,33 @@ entity Stock : cuid, managed {
 }
 
 @title: 'Purchase Orders'
-entity PurchaseOrders : cuid, managed {
-    BusinessPartner : Association to BusinessPartners;
+entity PurchaseOrders {
+    key PurchaseOrderNumber : String;
+    //BusinessPartner : Association to BusinessPartners where isVendor = true;
     PurchaseOrderDate : Date;
     Items : Composition of many PurchaseOrderItems on Items.PurchaseOrder = $self;
 }
 
+
 @title: 'Purchase Order Items'
-entity PurchaseOrderItems : cuid {
+entity PurchaseOrderItems {
+    key ItemID : Integer;
     PurchaseOrder : Association to PurchaseOrders;
     Product : Association to Products;
     Quantity : Integer;
-    Price : Decimal(15,2);
+    Price : Decimal(15,2); // Validation: Price should not be more than the cost price in Products.
+    Store : Association to Stores;
 }
 
+
 @title: 'Sales Orders'
-entity SalesOrders : cuid, managed {
-    BusinessPartner : Association to BusinessPartners;
+entity SalesOrders {
+    key SalesOrderNumber : String;
+    //BusinessPartner : Association to BusinessPartners where isCustomer = true;
     SalesDate : Date;
     Items : Composition of many SalesOrderItems on Items.SalesOrder = $self;
 }
+
 
 @title: 'Sales Order Items'
 entity SalesOrderItems : cuid {

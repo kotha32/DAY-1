@@ -5,20 +5,21 @@ service nnrg {
     entity Products as projection on db.Products;
     entity Stock as projection on db.Stock;
     entity States as projection on db.States;
-    entity PurchaseOrders as projection on db.PurchaseOrders;
-    entity PurchaseOrderItems as projection on db.PurchaseOrderItems;
-    entity SalesOrders as projection on db.SalesOrders;
-    entity SalesOrderItems as projection on db.SalesOrderItems;
+    // entity PurchaseOrders as projection on db.PurchaseOrders;
+    // entity PurchaseOrderItems as projection on db.PurchaseOrderItems;
+    // entity SalesOrders as projection on db.SalesOrders;
+    // entity SalesOrderItems as projection on db.SalesOrderItems;
 }
+
 annotate nnrg.BusinessPartners with @odata.draft.enabled;
 annotate nnrg.Stores with @odata.draft.enabled;
 annotate nnrg.Products with @odata.draft.enabled;
 annotate nnrg.States with @odata.draft.enabled;
 annotate nnrg.Stock with @odata.draft.enabled;
-annotate nnrg.PurchaseOrders with @odata.draft.enabled;
-annotate nnrg.PurchaseOrderItems with @odata.draft.enabled;
-annotate nnrg.SalesOrders with @odata.draft.enabled;
-annotate nnrg.SalesOrderItems with @odata.draft.enabled;
+// annotate nnrg.PurchaseOrders with @odata.draft.enabled;
+// annotate nnrg.PurchaseOrderItems with @odata.draft.enabled;
+// annotate nnrg.SalesOrders with @odata.draft.enabled;
+// annotate nnrg.SalesOrderItems with @odata.draft.enabled;
 
 // Validation annotations
 annotate nnrg.BusinessPartners with {
@@ -223,100 +224,102 @@ annotate nnrg.Products with {
 ImageURL;
 };
 
-annotate nnrg.PurchaseOrders with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: BusinessPartner.BPNumber },
-        { $Type: 'UI.DataField', Value: PurchaseOrderDate }
-    ],
-    UI.SelectionFields: [ BusinessPartner.BPNumber ],
-    UI.FieldGroup #PurchaseOrderInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: BusinessPartner.BPNumber },
-            { $Type: 'UI.DataField', Value: PurchaseOrderDate }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'PurchaseOrderInfoFacet',
-            Label: 'Purchase Order Information',
-            Target: '@UI.FieldGroup#PurchaseOrderInformation'
-        }
-    ]
-);
+// annotate nnrg.PurchaseOrders with @(
+//     UI.LineItem: [
+//         { $Type: 'UI.DataField', Value: 'BusinessPartner' },
+//         { $Type: 'UI.DataField', Value: 'PurchaseOrderDate' }
+//     ],
+//     UI.SelectionFields: [ 'BusinessPartner' ],
+//     UI.FieldGroup #PurchaseOrderInformation: {
+//         $Type: 'UI.FieldGroupType',
+//         Data: [
+//             { $Type: 'UI.DataField', Value: 'BusinessPartner' },
+//             { $Type: 'UI.DataField', Value: 'PurchaseOrderDate' }
+//         ]
+//     },
+//     UI.Facets: [
+//         {
+//             $Type: 'UI.ReferenceFacet',
+//             ID: 'PurchaseOrderInfoFacet',
+//             Label: 'Purchase Order Information',
+//             Target: '@UI.FieldGroup#PurchaseOrderInformation'
+//         }
+//     ]
+// );
 
-annotate nnrg.PurchaseOrderItems with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: PurchaseOrder.ID },
-        { $Type: 'UI.DataField', Value: Product.ProductID },
-        { $Type: 'UI.DataField', Value: Quantity },
-        { $Type: 'UI.DataField', Value: Price }
-    ],
-    UI.FieldGroup #PurchaseOrderItemInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: PurchaseOrder.ID },
-            { $Type: 'UI.DataField', Value: Product.ProductID },
-            { $Type: 'UI.DataField', Value: Quantity },
-            { $Type: 'UI.DataField', Value: Price }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'PurchaseOrderItemInfoFacet',
-            Label: 'Purchase Order Item Information',
-            Target: '@UI.FieldGroup#PurchaseOrderItemInformation'
-        }
-    ]
-);
+// annotate nnrg.PurchaseOrderItems with @(
+//     UI.LineItem: [
+//         { $Type: 'UI.DataField', Value: 'PurchaseOrder' },
+//         { $Type: 'UI.DataField', Value: 'Product' },
+//         { $Type: 'UI.DataField', Value: 'Quantity' },
+//         { $Type: 'UI.DataField', Value: 'Price' }
+//     ],
+//     UI.FieldGroup #PurchaseOrderItemInformation: {
+//         $Type: 'UI.FieldGroupType',
+//         Data: [
+//             { $Type: 'UI.DataField', Value: 'PurchaseOrder' },
+//             { $Type: 'UI.DataField', Value: 'Product' },
+//             { $Type: 'UI.DataField', Value: 'Quantity' },
+//             { $Type: 'UI.DataField', Value: 'Price' }
+//         ]
+//     },
+//     UI.Facets: [
+//         {
+//             $Type: 'UI.ReferenceFacet',
+//             ID: 'PurchaseOrderItemInfoFacet',
+//             Label: 'Purchase Order Item Information',
+//             Target: '@UI.FieldGroup#PurchaseOrderItemInformation'
+//         }
+//     ]
+// );
 
-annotate nnrg.SalesOrders with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: BusinessPartner_ID },
-        { $Type: 'UI.DataField', Value: SalesDate }
-    ],
-    UI.SelectionFields: [ BusinessPartner_ID ],
-    UI.FieldGroup #SalesOrderInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: BusinessPartner_ID },
-            { $Type: 'UI.DataField', Value: SalesDate }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'SalesOrderInfoFacet',
-            Label: 'Sales Order Information',
-            Target: '@UI.FieldGroup#SalesOrderInformation'
-        }
-    ]
-);
+// annotate nnrg.SalesOrders with @(
+//     UI.LineItem: [
+//         { $Type: 'UI.DataField', Value: 'BusinessPartner' },
+//         { $Type: 'UI.DataField', Value: 'SalesDate' }
+//     ],
+//     UI.SelectionFields: [ 'BusinessPartnerID' ],
+//     UI.FieldGroup #SalesOrderInformation: {
+//         $Type: 'UI.FieldGroupType',
+//         Data: [
+//             { $Type: 'UI.DataField', Value: 'BusinessPartner' },
+//             { $Type: 'UI.DataField', Value: 'SalesDate' }
+//         ]
+//     },
+//     UI.Facets: [
+//         {
+//             $Type: 'UI.ReferenceFacet',
+//             ID: 'SalesOrderInfoFacet',
+//             Label: 'Sales Order Information',
+//             Target: '@UI.FieldGroup#SalesOrderInformation'
+//         }
+//     ]
+// );
 
-annotate nnrg.SalesOrderItems with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: SalesOrder_ID },
-        { $Type: 'UI.DataField', Value: Product_ID },
-        { $Type: 'UI.DataField', Value: Quantity },
-        { $Type: 'UI.DataField', Value: Price }
-    ],
-    UI.FieldGroup #SalesOrderItemInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: SalesOrder_ID },
-            { $Type: 'UI.DataField', Value: Product_ID },
-            { $Type: 'UI.DataField', Value: Quantity },
-            { $Type: 'UI.DataField', Value: Price }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'SalesOrderItemInfoFacet',
-            Label: 'Sales Order Item Information',
-            Target: '@UI.FieldGroup#SalesOrderItemInformation'
-        }
-    ]
-);
+// annotate nnrg.SalesOrderItems with @(
+//     UI.LineItem: [
+//         { $Type: 'UI.DataField', Value: 'SalesOrder' },
+//         { $Type: 'UI.DataField', Value: 'Product' },
+//         { $Type: 'UI.DataField', Value: 'Quantity' },
+//         { $Type: 'UI.DataField', Value: 'Price' }
+//     ],
+//     UI.FieldGroup #SalesOrderItemInformation: {
+//         $Type: 'UI.FieldGroupType',
+//         Data: [
+//             { $Type: 'UI.DataField', Value: 'SalesOrder' },
+//             { $Type: 'UI.DataField', Value: 'Product' },
+//             { $Type: 'UI.DataField', Value: 'Quantity' },
+//             { $Type: 'UI.DataField', Value: 'Price' }
+//         ]
+//     },
+//     UI.Facets: [
+//         {
+//             $Type: 'UI.ReferenceFacet',
+//             ID: 'SalesOrderItemInfoFacet',
+//             Label: 'Sales Order Item Information',
+//             Target: '@UI.FieldGroup#SalesOrderItemInformation'
+//         }
+//     ]
+// );
+
+
