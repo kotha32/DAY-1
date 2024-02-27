@@ -1,0 +1,45 @@
+{
+  "name": "DAY-1",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^7",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "@sap/ux-specification": "^1.120.4"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-businesspartners": "cds watch --open businesspartners/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-states": "cds watch --open states/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-products": "cds watch --open products/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-stores": "cds watch --open stores/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-stock": "cds watch --open stock/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "cds": {
+    "fiori": {
+      "lean_draft": true,
+      "bypass_draft": true
+    },
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+        "url": "db.sqlite"
+      }
+    }
+  },
+  "sapux": [
+    "app/businesspartners",
+    "app/states",
+    "app/products",
+    "app/stores",
+    "app/stock"
+  ]
+}
+}

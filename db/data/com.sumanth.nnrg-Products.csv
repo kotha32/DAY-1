@@ -1,0 +1,6 @@
+ID,ProductID,Name,ImageURL,CostPrice,SellPrice
+d023ad2f-5588-4e6b-8a97-7e2c13ac1661,SPH-001,Galaxy S21,https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-card-40-iphone15hero-202309_FMT_WHH?wid=508&hei=472&fmt=p-jpg&qlt=95&.v=1693086369781,52500,67500
+a8f77b49-2b0f-4d4d-85c8-50cbdd79f6ac,LTP-002,Dell XPS 13,https://images.example.com/products/laptop.jpg,67500,90000
+b4f1ac39-3c64-4d44-a4c1-b252a9ee0cc7,TBL-003,iPad Air,https://images.example.com/products/tablet.jpg,37500,48750
+f1c2ed58-8653-4d7c-9f55-fd9281d4d129,SWT-004,Apple Watch,https://images.example.com/products/smartwatch.jpg,15000,19500
+e57f89d2-9007-4a34-8946-4a2a051da629,HPH-005,Sony WH-1000XM4,https://images.example.com/products/headphones.jpg,13500,17250
