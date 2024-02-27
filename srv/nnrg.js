@@ -1,32 +1,23 @@
-// const cds = require('@sap/cds');
+const cds = require('@sap/cds');
+module.exports = cds.service.impl(function () {
+    const { BusinessPartners, States, Products } = this.entities();
+    this.before(["CREATE", "UPDATE"], BusinessPartners, async (req) => {
+        // const gst = req.data.gst_no;
+        // const is_gstn_registered = req.data.is_gstn_registered;
+        // if (is_gstn_registered == true && gst == null) {
+        //   req.error({
+        //     code: "INVALID_GST_NO",
+        //     message: "Enter gst registered number please",
+        //     target: "is_gstn_registered",
+        //   });
+        // }
+        const results = await cds
+        .transaction(req)
+        .run(SELECT.from(BusinessPartners));
+        const count = results.length;
+    
+        req.data.BPNumber = count + 1;
+    });
 
-// module.exports = cds.service.impl(async function () {
-//     const { States, BusinessPartners } = this.entities;
+});
 
-//     this.on("READ", BusinessPartners, async (req) => {
-//         const results = await cds.run(req.query);
-//         return results;
-//     });
-
-//     this.before("CREATE", BusinessPartners, async (req) => {
-//         const { BPNumber, IsGSTNRegistered, GSTINNumber } = req.data;
-//         if (IsGSTNRegistered && !GSTINNumber) {
-//             req.error({
-//                 code: "MISSING_GST_NUM",
-//                 message: "GSTIN number is mandatory when IsGSTNRegistered is true",
-//                 target: "GSTINNumber",
-//             });
-//         }
-
-//         const query1 = SELECT.from(BusinessPartners).where({ BPNumber: BPNumber });
-//         const result = await cds.run(query1); // Execute the query using cds.run()
-//         if (result.length > 0) {
-//             req.error({
-//                 code: "BPNUMBEREXISTS",
-//                 message: "Business Partner with this BPNumber already exists",
-//                 target: "BPNumber",
-//             });
-//         }
-//     });
-
-// });

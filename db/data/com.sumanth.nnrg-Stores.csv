@@ -1,6 +1,6 @@
-StoreID,Name,Address1,Address2,City,PINCode
-S001,Electronics Hub,123 Tech Street,Suite 100,Tech City,500072
-S002,Gadget World,456 Gadget Lane,Building 5,Innovate Town,560034
-S003,Digital Den,789 Digital Ave,Floor 2,Cyber City,400076
-S004,Tech Bazaar,1010 Innovation Blvd,Unit 20,Future City,110001
-S005,Gizmo Galaxy,2020 Gizmo Road,Block B,Electro Town,600042
+ID,StoreID,Name,Address1,Address2,City,PINCode
+8fcade7e-2624-4893-8155-dafdaf3ff4db,S001,Electronics Hub,123 Tech Street,Suite 100,Tech City,500072
+2c0fae26-351a-4b5b-b1c6-8c1c7363a644,S002,Gadget World,456 Gadget Lane,Building 5,Innovate Town,560034
+ba2ac491-58b0-4054-a559-b66ed3aed674,S003,Digital Den,789 Digital Ave,Floor 2,Cyber City,400076
+f840978f-f64a-4eef-90c6-ca4c1730f2fa,S004,Tech Bazaar,1010 Innovation Blvd,Unit 20,Future City,110001
+03d220a5-a1d2-409a-884c-00ef0632287a,S005,Gizmo Galaxy,2020 Gizmo Road,Block B,Electro Town,600042

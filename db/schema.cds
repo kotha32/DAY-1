@@ -4,7 +4,7 @@ using { managed, cuid } from '@sap/cds/common';
 @title: 'Business Partners'
 entity BusinessPartners : cuid, managed {
     @title: 'Business Partner Number'
-    BPNumber        : Integer;
+    BPNumber        : Integer default 0 @Core.Computed;
     @title: 'Name'
     Name            : String(20);
     @title: 'Address Line 1'
@@ -40,7 +40,7 @@ entity Stores : cuid, managed {
     @title: 'City'
     City      : String;
     @title: 'State'
-    State     : Association to States;
+    state     : Association to States;
     @title: 'PIN Code'
     PINCode   : String(6);
 }
@@ -50,7 +50,7 @@ entity Products : cuid, managed {
     @title: 'Product ID' // Updated to use UUID
     ProductID    : UUID;
     @title: 'Name'
-    Name         : String;
+    ProductName         : String;
     @title: 'Image URL'
     ImageURL     : String;
     @title: 'Cost Price'
@@ -62,13 +62,14 @@ entity Products : cuid, managed {
 @title: 'States'
 entity States  {
     @title: 'Code'
-    key Code        : String;
+    key Code : String;
     @title: 'Description'
     Description : String;
 }
 
 @title: 'Stock'
-entity Stock : cuid, managed {
+entity Stock  {
+    key ID : UUID;
     @title: 'Store'
     Store       : Association to Stores;
     @title: 'Product'
@@ -77,34 +78,32 @@ entity Stock : cuid, managed {
     StockQty    : Integer;
 }
 
-@title: 'Purchase Orders'
-entity PurchaseOrders {
+entity PurchaseOrders : managed {
     key PurchaseOrderNumber : String;
-    //BusinessPartner : Association to BusinessPartners where isVendor = true;
+    BusinessPartner : Association to BusinessPartners;
     PurchaseOrderDate : Date;
-    Items : Composition of many PurchaseOrderItems on Items.PurchaseOrder = $self;
+    Items : Composition of many PurchaseOrderItems;
+    // Assume @odata.draft.enabled is applied here
 }
 
-
-@title: 'Purchase Order Items'
+// Remove draft support from PurchaseOrderItems
 entity PurchaseOrderItems {
     key ItemID : Integer;
     PurchaseOrder : Association to PurchaseOrders;
     Product : Association to Products;
     Quantity : Integer;
-    Price : Decimal(15,2); // Validation: Price should not be more than the cost price in Products.
+    Price : Decimal(15,2);
     Store : Association to Stores;
+    // @odata.draft.enabled annotation removed
 }
-
 
 @title: 'Sales Orders'
 entity SalesOrders {
     key SalesOrderNumber : String;
-    //BusinessPartner : Association to BusinessPartners where isCustomer = true;
+    BusinessPartner : Association to BusinessPartners;
     SalesDate : Date;
-    Items : Composition of many SalesOrderItems on Items.SalesOrder = $self;
+    Items : Composition of many SalesOrderItems;
 }
-
 
 @title: 'Sales Order Items'
 entity SalesOrderItems : cuid {
