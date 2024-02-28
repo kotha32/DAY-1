@@ -4,7 +4,7 @@ using { managed, cuid } from '@sap/cds/common';
 @title: 'Business Partners'
 entity BusinessPartners : cuid, managed {
     @title: 'Business Partner Number'
-    BPNumber        : Integer default 0 @Core.Computed;
+    BPNumber        : Integer  @Core.Computed;
     @title: 'Name'
     Name            : String(20);
     @title: 'Address Line 1'
@@ -29,8 +29,9 @@ entity BusinessPartners : cuid, managed {
 
 @title: 'Stores'
 entity Stores : cuid, managed {
+    key ID : UUID;
     @title: 'Store ID' // Updated to use UUID
-    StoreID   : UUID;
+    StoreID   : String(10);
     @title: 'Name'
     Name      : String;
     @title: 'Address Line 1'
@@ -44,11 +45,11 @@ entity Stores : cuid, managed {
     @title: 'PIN Code'
     PINCode   : String(6);
 }
-
 @title: 'Products'
 entity Products : cuid, managed {
+    key ID : UUID;
     @title: 'Product ID' // Updated to use UUID
-    ProductID    : UUID;
+    ProductID    : String(10);
     @title: 'Name'
     ProductName         : String;
     @title: 'Image URL'
@@ -71,44 +72,29 @@ entity States  {
 entity Stock  {
     key ID : UUID;
     @title: 'Store'
-    Store       : Association to Stores;
+    storeId       : Association to Stores;
     @title: 'Product'
-    Product     : Association to Products;
+    productId     : Association to Products;
     @title: 'Stock Quantity'
-    StockQty    : Integer;
+    stock_qty    : Integer;
 }
 
-entity PurchaseOrders : managed {
-    key PurchaseOrderNumber : String;
-    BusinessPartner : Association to BusinessPartners;
-    PurchaseOrderDate : Date;
-    Items : Composition of many PurchaseOrderItems;
-    // Assume @odata.draft.enabled is applied here
-}
-
-// Remove draft support from PurchaseOrderItems
-entity PurchaseOrderItems {
-    key ItemID : Integer;
-    PurchaseOrder : Association to PurchaseOrders;
-    Product : Association to Products;
-    Quantity : Integer;
-    Price : Decimal(15,2);
-    Store : Association to Stores;
-    // @odata.draft.enabled annotation removed
-}
-
-@title: 'Sales Orders'
-entity SalesOrders {
-    key SalesOrderNumber : String;
-    BusinessPartner : Association to BusinessPartners;
-    SalesDate : Date;
-    Items : Composition of many SalesOrderItems;
-}
-
-@title: 'Sales Order Items'
-entity SalesOrderItems : cuid {
-    SalesOrder : Association to SalesOrders;
-    Product : Association to Products;
-    Quantity : Integer;
-    Price : Decimal(15,2);
+entity PurchaseOrder : cuid, managed {
+    @title:'Purchase Order Number'
+    purchaseOrderNumber : Integer;
+    @title:'Purchase Order Date'
+    purchaseOrderDate : Date;
+    @title:'Business Partner'
+    businessPartner : Association to BusinessPartners;
+    @title:'Items'
+    items: Composition of many {
+        @title:'Product ID'
+        product_id : Association to Products;
+        @title:'Quantity'
+        qty : Integer;
+        @title:'Price'
+        price : Association to Products;
+        @title:'Store ID'
+        store_id : Association to Stores;
+    };
 }
