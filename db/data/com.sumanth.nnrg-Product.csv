@@ -1,4 +1,4 @@
-ID,ProductID,ProductName,ImageURL,CostPrice,SellPrice
+ID,product_id,product_name,product_img,product_cost,product_sell
 d023ad2f-5588-4e6b-8a97-7e2c13ac1661,SPH-001,Galaxy S21,https://media.wired.com/photos/6008b7cd103a85a519187c3e/191:100/w_1280c_limit/Gear-galaxys21_plus_phantom_silver_front.jpg,52500,67500
 a8f77b49-2b0f-4d4d-85c8-50cbdd79f6ac,LTP-002,Dell XPS 13,https://m.media-amazon.com/images/I/41D1SYZ2sPL.jpg,67500,90000
 b4f1ac39-3c64-4d44-a4c1-b252a9ee0cc7,TBL-003,iPad Air,https://m.media-amazon.com/images/I/31reJbshTLL._SY445_SX342_QL70_FMwebp_.jpg,37500,48750

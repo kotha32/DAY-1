@@ -1,66 +1,136 @@
 const cds = require('@sap/cds');
-module.exports = cds.service.impl(function () {
-    const { BusinessPartners, States, Products } = this.entities();
-    this.before(["CREATE"], BusinessPartners, async (req) => {
-        const results = await cds
-        .transaction(req)
-        .run(SELECT.from(BusinessPartners));
-        const count = results.length;
-    
-        req.data.BPNumber = count + 1;
-    });
 
-    // Adjusted entity names according to the new schema
+module.exports = cds.service.impl(async function () {
+    const { States, Business_Partner, Stock, Product, PurchaseApp, SalesApp } = this.entities;
 
-    this.on("READ", BusinessPartners, async (req) => {
+    // READ Business_Partner
+    this.on("READ", Business_Partner, async (req) => {
         const results = await cds.run(req.query);
         return results;
     });
 
-    this.before("CREATE", BusinessPartners, async (req) => {
-        // Adjusted field names according to the new schema
-        const { BPNumber, IsGSTNRegistered, GSTINNumber } = req.data;
-        if (IsGSTNRegistered && !GSTINNumber) {
+    // CREATE Business_Partner
+    this.before("CREATE", Business_Partner, async (req) => {
+        const { Is_gstn_registered, Gst_num } = req.data;
+        if (Is_gstn_registered && !Gst_num) {
             req.error({
                 code: "MISSING_GST_NUM",
-                message: "GSTIN number is mandatory when IsGSTNRegistered is true",
-                target: "GSTINNumber",
+                message: "GSTIN number is mandatory when Is_gstn_registered is true",
+                target: "Gst_num",
             });
         }
 
-        // Query to check if the BPNumber already exists
-        const query = SELECT.from(BusinessPartners).where({ BPNumber: req.data.BPNumber });
-        const result = await cds.run(query);
+        const query1 = SELECT.from(Business_Partner).where({ bp_no: req.data.bp_no });
+        const result = await cds.run(query1);
         if (result.length > 0) {
             req.error({
-                code: "BPNUMBER_EXISTS",
-                message: "Business Partner number already exists",
-                target: "BPNumber",
+                code: "STEMAILEXISTS",
+                message: "Business partner already exists",
+                target: "bp_no",
             });
         }
     });
 
-    this.before(["CREATE"], Products, async (req) => {
-        // Adjusted field names according to the new schema
-        const { CostPrice, SellPrice } = req.data;
-        if (SellPrice < CostPrice) {
+    // CREATE Product
+    this.before("CREATE", Product, async (req) => {
+        const query2 = SELECT.from(Product).where({ product_id: req.data.product_id });
+        const result1 = await cds.run(query2);
+        if (result1.length > 0) {
             req.error({
-                code: "INVALID_SELLING_PRICE",
-                message: "Selling price should not be less than Cost Price",
-                target: "SellPrice",
+                code: "PRODUCTIDEXISTS",
+                message: "Product id already exists",
+                target: "product_id",
+            });
+        }
+
+        const { product_cost, product_sell } = req.data;
+        if (product_sell <= product_cost) {
+            req.error({
+                code: "INVALIDSELL",
+                message: "Selling price cannot be less than or equal to cost price",
+                target: "product_sell",
             });
         }
     });
 
-    // Commented out custom handling for States as it seems you might want static data
-    // Uncomment and adjust if needed
-    // this.on('READ', States, async (req) => {
-    //     const states = [
-    //         { "code": "TS", "description": "Telangana" },
-    //         { "code": "AY", "description": "Ayodha" },
-    //         { "code": "DL", "description": "Delhi" },
-    //     ];
-    //     states.$count = states.length;
-    //     return states;
-    // });
+    // CREATE PurchaseApp
+    this.before("CREATE", PurchaseApp, async (req) => {
+        const { Items } = req.data;
+        const stoc = req.data.storeId_ID;
+        for (const item of Items) {
+            const product = await cds.read(Product).where({ ID: item.productId_ID });
+            const product_cost = product[0].product_cost;
+            const price = item.price;
+            if (price > product_cost) {
+                req.error({
+                    code: "INVALID_PRICE",
+                    message: "Price for product cannot be more than cost price for product: " + product[0].name,
+                    target: "Items",
+                });
+            }
+            const stockEntry = await cds.read(Stock).where({ productId: item.productId_ID });
+
+            if (stockEntry.length > 0) {
+            const currentQuantity = stockEntry[0].stock_qty;
+            const newQuantity = currentQuantity + item.qty;
+          
+            // await cds.update(Stock, { ID: stockEntry[0].ID }).with({ stock_qty: newQuantity });
+            await cds.run(UPDATE(Stock).set({ stock_qty: newQuantity }).where({ productId: item.productId_ID}).and({storeId:stoc}));
+        }
+        }
+    });
+
+    // CREATE SalesApp
+    this.before("CREATE", SalesApp, async (req) => {
+        const { Items } = req.data;
+        const stoc = req.data.storeId_ID;
+        for (const item of Items) {
+            const product = await cds.read(Product).where({ ID: item.productId_ID });
+            const product_sell = product[0].product_sell;
+            const price = item.price;
+            if (price < product_sell) {
+                req.error({
+                    code: "INVALID_PRICE",
+                    message: "Price for product cannot be less than sell price for product: " + product[0].name,
+                    target: "Items",
+                });
+            }
+            const stockEntry = await cds.read(Stock).where({ productId: item.productId_ID });
+
+            if (stockEntry.length > 0) {
+            const currentQuantity = stockEntry[0].stock_qty;
+            const newQuantity = item.qty;
+
+            if (newQuantity > currentQuantity) {
+                req.error({
+                    code: "INSUFFICIENT_STOCK",
+                    message: `Insufficient stock for product ${item.productId_ID}. Available quantity: ${currentQuantity}`,
+                    target: "Items",
+                });
+            } else {
+            const updatedStockQuantity = currentQuantity - newQuantity;
+            // await cds.update(Stock, { ID: stockEntry[0].ID }).with({ stock_qty: newQuantity });
+            await cds.run(UPDATE(Stock).set({ stock_qty: updatedStockQuantity }).where({ productId: item.productId_ID}).and({storeId:stoc}));
+        }
+    }
+}
+    });
+
+    // READ States
+    this.on('READ', States, async (req) => {
+        const stat = [
+            { "code": "TS", "description": "Telangana" },
+            { "code": "AY", "description": "Ayodha" },
+            { "code": "DL", "description": "Delhi" },
+        ];
+        stat.$count = stat.length;
+        return stat;
+    });
+
+    // CREATE/UPDATE Business_Partner
+    this.before(["CREATE", "UPDATE"], Business_Partner, async (req) => {
+        const results = await cds.transaction(req).run(SELECT.from(Business_Partner));
+        const count = results.length;
+        req.data.bp_no = count + 1;
+    });
 });

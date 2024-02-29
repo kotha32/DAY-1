@@ -1,303 +1,489 @@
 using { com.sumanth.nnrg as db } from '../db/schema';
+
 service nnrg {
-    entity BusinessPartners as projection on db.BusinessPartners;
-    entity Stores as projection on db.Stores{
-        @UI.Hidden:true
-        ID,
-        *
+    entity Business_Partner as projection on db.Business_Partner;
+    entity States           as projection on db.States;
+    
+    entity Store            as
+        projection on db.Store {
+            @UI.Hidden: true
+            ID,
+            *
+        };
+
+    entity Product          as
+        projection on db.Product {
+            @UI.Hidden: true
+            ID,
+            *
+        };
+
+    entity Stock            as projection on db.Stock{
+        @UI.Hidden: true
+            ID,
+            *
     };
-    entity Products as projection on db.Products{
-        @UI.Hidden:true
-        ID,
-        *
-    };
-    entity Stock as projection on db.Stock{
-        @UI.Hidden:true
-        ID,
-        *
-    };
-    entity States as projection on db.States;
-    entity PurchaseOrder as projection on db.PurchaseOrder;
+    entity PurchaseApp      as projection on db.PurchaseApp;
+    entity SalesApp         as projection on db.SalesApp;
 }
 
-annotate nnrg.BusinessPartners with @odata.draft.enabled;
-annotate nnrg.Stores with @odata.draft.enabled;
-annotate nnrg.Products with @odata.draft.enabled;
-annotate nnrg.States with @odata.draft.enabled;
+annotate nnrg.Business_Partner with @odata.draft.enabled;
+annotate nnrg.Store with @odata.draft.enabled;
+annotate nnrg.Product with @odata.draft.enabled;
 annotate nnrg.Stock with @odata.draft.enabled;
-annotate nnrg.PurchaseOrder with @odata.draft.enabled;
+annotate nnrg.PurchaseApp with @odata.draft.enabled;
+annotate nnrg.SalesApp with @odata.draft.enabled;
 
-// Validation annotations
-annotate nnrg.BusinessPartners with {
-    GSTINNumber @assert.format: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$';
-    PINCode @assert.format: '^[1-9][0-9]{5}$';
-    //IsGSTNRegistered @(mandatory: true, default: false);
+annotate nnrg.Business_Partner with {
+    pinCode @assert.format: '^[1-9][0-9]{5}$';
+    Gst_num @assert.format: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[0-9]{1}$';
+}
+
+annotate nnrg.Product with {
+    product_img @assert.match: '^https?:\/\/.*\.(?:png|jpg|jpeg)$';
 };
 
-annotate nnrg.Products with {
-    ImageURL @assert.match: '^https?:\/\/.*\.(?:png|jpg|jpeg)$';
-};
-// Annotations for Business Partners
-annotate nnrg.BusinessPartners with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: BPNumber },
-        { $Type: 'UI.DataField', Value: Name },
-        { $Type: 'UI.DataField', Value: Address1 },
-        { $Type: 'UI.DataField', Value: Address2 },
-        { $Type: 'UI.DataField', Value: City },
-        { Label: 'State', Value: state_Code },
-        { Label: 'PINCode', Value: PINCode },
-        { $Type: 'UI.DataField', Value: IsGSTNRegistered },
-        { $Type: 'UI.DataField', Value: GSTINNumber },
-        { $Type: 'UI.DataField', Value: IsVendor },
-        { $Type: 'UI.DataField', Value: IsCustomer }
-    ],
-    UI.SelectionFields: [ Name, City ],
-    UI.FieldGroup #BusinessPartnerInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: BPNumber },
-            { $Type: 'UI.DataField', Value: Name },
-            { $Type: 'UI.DataField', Value: Address1 },
-            { $Type: 'UI.DataField', Value: Address2 },
-            { $Type: 'UI.DataField', Value: City },
-            { Label: 'State', Value: state_Code },
-            { Label: 'PINCode', Value: PINCode },
-            { $Type: 'UI.DataField', Value: IsGSTNRegistered },
-            { $Type: 'UI.DataField', Value: GSTINNumber },
-            { $Type: 'UI.DataField', Value: IsVendor },
-            { $Type: 'UI.DataField', Value: IsCustomer }
-        ]
+annotate nnrg.States with @(UI.LineItem: [
+    {
+        $Type: 'UI.DataField',
+        Value: code
     },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'BusinessPartnerInfoFacet',
-            Label: 'Business Partner Information',
-            Target: '@UI.FieldGroup#BusinessPartnerInformation'
-        }
-    ]
+    {
+        $Type: 'UI.DataField',
+        Value: description
+    },
+],
+
 );
 
-// Annotations for States
-annotate nnrg.States with @(
-    UI.LineItem: [
+annotate nnrg.Business_Partner with @(
+    UI.LineItem             : [
+
         {
-            Value: Code
+            Label: 'Bussiness Partner Id',
+            Value: bp_no
         },
         {
-            Value: Description
-        }
+            Label: 'Name',
+            Value: name
+        },
+        {
+            Label: 'Address 1',
+            Value: add1
+        },
+        {
+            Label: 'Address 2',
+            Value: add2
+        },
+        {
+            Label: 'City',
+            Value: city
+        },
+        {
+            Label: 'State',
+            Value: state_code
+        },
+        {
+            Label: 'Is_gstn_registered',
+            Value: Is_gstn_registered
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : Is_vendor
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : Is_customer
+        },
+        {
+            Label: 'GSTIN Number',
+            Value: Gst_num
+        },
     ],
-    UI.FieldGroup #States: {
+    UI.FieldGroup #BusinessP: {
         $Type: 'UI.FieldGroupType',
-        Data: [
+        Data : [
             {
-                Value: Code,
+                $Type: 'UI.DataField',
+                Value: name
             },
             {
-                Value: Description,
-            }
+                $Type: 'UI.DataField',
+                Value: add1
+            },
+            {
+                $Type: 'UI.DataField',
+                Value: add2
+            },
+            {
+                $Type: 'UI.DataField',
+                Value: city
+            },
+            {
+                $Type: 'UI.DataField',
+                Value: pinCode
+            },
+            {
+                $Type: 'UI.DataField',
+                Value: state_code
+            },
+            {
+            $Type : 'UI.DataField',
+            Value : Is_vendor
+            },
+            {
+            $Type : 'UI.DataField',
+            Value : Is_customer
+            },
+            {
+                $Type : 'UI.DataField',
+                Value: Is_gstn_registered},
+            {
+                $Type: 'UI.DataField',
+                Value: Gst_num
+            },
         ],
     },
-    UI.Facets: [
+    UI.Facets               : [{
+        $Type : 'UI.ReferenceFacet',
+        ID    : 'BusinessPFacet',
+        Label : 'BusinessP',
+        Target: '@UI.FieldGroup#BusinessP',
+    }, ],
+);
+
+
+annotate nnrg.Store with @(
+    UI.LineItem         : [
         {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'StatesFacet',
-            Label: 'States',
-            Target: '@UI.FieldGroup#States',
+            Label: 'Store Id',
+            Value: store_id
+        },
+        {
+            Label: 'Store name',
+            Value: name
+        },
+        {
+            Label: 'Address 1',
+            Value: add1
+        },
+        {
+            Label: 'Address 2',
+            Value: add2
+        },
+        {
+            Label: 'City',
+            Value: city
+        },
+        {
+            Label: 'State',
+            Value: state_code
+        },
+        {
+            Label: 'Pin code',
+            Value: PinCode // corrected to PinCode
         },
     ],
-);
-
-// Annotations for Store
-annotate nnrg.Stores with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: StoreID },
-        { $Type: 'UI.DataField', Value: Name },
-        { $Type: 'UI.DataField', Value: Address1 },
-        { $Type: 'UI.DataField', Value: Address2 },
-        { $Type: 'UI.DataField', Value: City },
-        { Label: 'State', Value: state_Code },
-        { Label: 'PINCode', Value: PINCode }
-    ],
-    UI.SelectionFields: [ Name, City ],
-    UI.FieldGroup #StoreInformation: {
+    UI.FieldGroup #store: {
         $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: StoreID },
-            { $Type: 'UI.DataField', Value: Name },
-            { $Type: 'UI.DataField', Value: Address1 },
-            { $Type: 'UI.DataField', Value: Address2 },
-            { $Type: 'UI.DataField', Value: City },
-            { Label: 'State', Value: state_Code },
-            { Label: 'PINCode', Value: PINCode }
-        ]
+        Data : [
+            {
+                Label: 'Store Id',
+                Value: store_id
+            },
+            {
+                Label: 'Store name',
+                Value: name
+            },
+            {
+                Label: 'Address 1',
+                Value: add1
+            },
+            {
+                Label: 'Address 2',
+                Value: add2
+            },
+            {
+                Label: 'City',
+                Value: city
+            },
+            {
+                Label: 'State',
+                Value: state_code
+            },
+            {
+                Label: 'Pin code',
+                Value: PinCode
+            },
+        ],
     },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'StoreInfoFacet',
-            Label: 'Store Information',
-            Target: '@UI.FieldGroup#StoreInformation'
-        }
-    ]
+    UI.Facets           : [{
+        $Type : 'UI.ReferenceFacet',
+        ID    : 'storeFacet',
+        Label : 'store facets',
+        Target: '@UI.FieldGroup#store'
+    }, ],
 );
 
-// Annotations for Product
-annotate nnrg.Products with @(
-    UI.LineItem: [
-        { $Type: 'UI.DataField', Value: ProductID },
-        { $Type: 'UI.DataField', Value: ProductName },
-        { $Type: 'UI.DataField', Value: ImageURL },
-        { $Type: 'UI.DataField', Value: CostPrice },
-        { $Type: 'UI.DataField', Value: SellPrice }
-    ],
-    UI.SelectionFields: [ ProductName ],
-    UI.FieldGroup #ProductInformation: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-            { $Type: 'UI.DataField', Value: ProductID },
-            { $Type: 'UI.DataField', Value: ProductName },
-            { $Type: 'UI.DataField', Value: ImageURL },
-            { $Type: 'UI.DataField', Value: CostPrice },
-            { $Type: 'UI.DataField', Value: SellPrice }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'ProductInfoFacet',
-            Label: 'Product Information',
-            Target: '@UI.FieldGroup#ProductInformation'
-        }
-    ]
-);
 
-annotate nnrg.BusinessPartners with {
-    state @(
-        Common.ValueListWithFixedValues:true,
-        Common.Text: state.Description,
-        Common.ValueList: {
-            Label :'Genders',
-            CollectionPath:'States',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty: state_Code,
-                    ValueListProperty:'Code'
-                },
-                {
-                    $Type : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty:'Description'
-                }
-
-            ]
-        }
-    )
-}
-
-annotate nnrg.Stores with {
-    state @(
-        Common.ValueListWithFixedValues:true,
-        Common.Text: state.Description,
-        Common.ValueList: {
-            Label :'Genders',
-            CollectionPath:'States',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty: state_Code,
-                    ValueListProperty:'Code'
-                },
-                {
-                    $Type : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty:'Description'
-                }
-
-            ]
-        }
-    )
-}
-
-
-annotate nnrg.Products with {
+annotate nnrg.Product with {
 @Common.Text : ' {Product}'
 @Core.IsURL: true
 @Core.MediaType: 'image/jpg'
-ImageURL;
+product_img;
 };
 
-annotate nnrg.Stock with @(
+annotate nnrg.Product with @(
     UI.LineItem: [
         {
-            Label: 'Store ID',
-            Value: storeId_ID // Adjusted for association
+            $Type : 'UI.DataField',
+            Label:'ProductID',
+            Value : product_id
         },
         {
-            Label: 'Product ID',
-            Value: productId_ID // Adjusted for association
+            $Type : 'UI.DataField',
+            Value : product_name
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_img
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_cost
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_sell
+        }
+    ],  
+);
+annotate nnrg.Product with @(       
+    UI.FieldGroup #ProductInformation : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+            $Type : 'UI.DataField',
+            
+            Value : product_id
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_name
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_img
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_cost
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : product_sell
+        }
+        
+        ],
+    },
+
+
+    UI.Facets : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID : 'ProductInfoFacet',
+            Label : 'Product Information',
+            Target : '@UI.FieldGroup#ProductInformation',
+        },
+    ],    
+);
+
+annotate nnrg.Stock with @(
+    UI.LineItem         : [
+        {
+            Label: 'Store Id',
+            Value: storeId_ID
+        },
+        {
+            Label: 'Product Id',
+            Value: productId_ID
         },
         {
             Label: 'Stock Quantity',
             Value: stock_qty
         }
     ],
-    UI.FieldGroup #Stock: {
+    UI.FieldGroup #stock: {
         $Type: 'UI.FieldGroupType',
-        Data: [
+        Data : [
             {
-                Label: 'Store ID',
-                Value: storeId_ID // Adjusted for association
+                Label: 'Store Id',
+                Value: storeId_ID
             },
             {
-                Label: 'Product ID',
-                Value: productId_ID // Adjusted for association
+                Label: 'Product Id',
+                Value: productId_ID
             },
             {
                 Label: 'Stock Quantity',
                 Value: stock_qty
             }
-        ]
+        ],
     },
-    UI.Facets: [{
-        $Type: 'UI.ReferenceFacet',
-        ID: 'StockFacet',
-        Label: 'Stock',
-        Target: '@UI.FieldGroup#Stock'
-    }]
+    UI.Facets           : [{
+        $Type : 'UI.ReferenceFacet',
+        ID    : 'stockFacet',
+        Label : 'stock facets',
+        Target: '@UI.FieldGroup#stock'
+    }, ],
 );
 
-annotate nnrg.Stock with {
-    Store @(
-        Common.ValueListWithFixedValues:true,
-        Common.Text: Store.Name,
-        Common.ValueList: {
-            Label :'Stores',
-            CollectionPath:'Stores',
-            Parameters : [
+annotate nnrg.PurchaseApp with @(
+    UI.LineItem          : [
+        {
+            Label: 'Purchase Order Number',
+            Value: pon
+        },
+        {
+            Label: 'Business Partner',
+            Value: bp_ID
+        },
+        {
+            Label: 'Product purchase Date',
+            Value: pDate
+        },
+        {
+            Label: 'store',
+            Value: storeId_ID
+        },
+        {
+            Label: 'Items',
+            Value: Items.productId.product_name
+        },
+    ],
+    UI.FieldGroup #purApp: {
+        $Type: 'UI.FieldGroupType',
+        Data : [
+            {
+                Label: 'Purchase Order Number',
+                Value: pon
+            },
+            {
+                Label: 'Business Partner',
+                Value: bp_ID
+            },
+            {
+                Label: 'Product purchase Date',
+                Value: pDate
+            },
+            {
+            Label: 'store',
+            Value: storeId_ID
+            },
+        ],
+    },
+    UI.Facets            : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'purAppFacet',
+            Label : 'purApp facets',
+            Target: '@UI.FieldGroup#purApp'
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'itemssFacet',
+            Label : ' facets',
+            Target: 'Items/@UI.LineItem'
+        },
+    ],
+);
+
+
+annotate nnrg.SalesApp with @(
+    UI.LineItem          : [
+        {
+            Label: 'Purchase Order Number',
+            Value: son
+        },
+        {
+            Label: 'Business Partner',
+            Value: bp_ID
+        },
+        {
+            Label: 'Product purchase Date',
+            Value: saleDate
+        },
+        {
+            Label: 'store',
+            Value: storeId_ID
+        },
+    ],
+    UI.FieldGroup #salApp: {
+        $Type: 'UI.FieldGroupType',
+        Data : [
+            {
+                Label: 'Purchase Order Number',
+                Value: son
+            },
+            {
+                Label: 'Business Partner',
+                Value: bp_ID
+            },
+            {
+                Label: 'Product purchase Date',
+                Value: saleDate
+            },
+            {
+            Label: 'store',
+            Value: storeId_ID
+            },
+        ],
+    },
+    UI.Facets            : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'purAppFacet',
+            Label : 'purApp facets',
+            Target: '@UI.FieldGroup#salApp'
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'itemssFacet',
+            Label : ' facets',
+            Target: 'Items/@UI.LineItem'
+        },
+    ],
+);
+
+annotate nnrg.PurchaseApp with {
+    bp @(
+        Common.Text: bp.name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Business_Partner',
+            CollectionPath: 'Business_Partner',
+            Parameters    : [
                 {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty: Store.ID,
-                    ValueListProperty:'StoreID'
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: bp_ID,
+                    ValueListProperty: 'ID'
                 },
                 {
-                    $Type : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty:'Name'
-                }
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'name'
+                },
+
             ]
         }
-    )
-}
-
-annotate nnrg.Stock with {
-    storeId   @(
-        Common.Text: storeId.StoreID,
+    );
+    storeId @(
+        Common.Text: storeId.name,
         Common.TextArrangement: #TextOnly,
         Common.ValueListWithFixedValues: true,
         Common.ValueList               : {
             Label         : 'Store id',
-            CollectionPath: 'Stores',
+            CollectionPath: 'Store',
             Parameters    : [
                 {
                     $Type            : 'Common.ValueListParameterInOut',
@@ -306,19 +492,202 @@ annotate nnrg.Stock with {
                 },
                 {
                     $Type            : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'Name'
+                    ValueListProperty: 'name'
+                },
+
+            ]
+        }
+    );
+};
+
+annotate nnrg.SalesApp with {
+    bp @(
+        Common.Text: bp.name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Business_Partner',
+            CollectionPath: 'Business_Partner',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: bp_ID,
+                    ValueListProperty: 'ID'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'name'
+                },
+
+            ]
+        }
+    );
+    storeId @(
+        Common.Text: storeId.name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Store id',
+            CollectionPath: 'Store',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: storeId_ID,
+                    ValueListProperty: 'ID'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'name'
+                },
+
+            ]
+        }
+    );
+};
+
+annotate nnrg.PurchaseApp.Items with @(
+    UI.LineItem      : [
+        {Label:'Items',Value: productId_ID},
+    ],
+    UI.FieldGroup #purAppitems: {
+        $Type    : 'UI.FieldGroupType',
+        Data     : [
+            {Label: 'Products',Value: productId_ID},
+            {Label: 'Quantity', Value: qty},
+            {Label: 'Price', Value: price}
+        ],
+    },
+        UI.Facets: [{
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'purAppitemsFacet',
+            Label : 'purAppitems',
+            Target: '@UI.FieldGroup#purAppitems',
+        }, ]
+);
+
+annotate nnrg.SalesApp.Items with @(
+    UI.LineItem      : [
+        {Label:'Items',Value: productId_ID},
+    ],
+    UI.FieldGroup #SalAppitems: {
+        $Type    : 'UI.FieldGroupType',
+        Data     : [
+            {Label: 'Products',Value: productId_ID},
+            {Label: 'Quantity', Value: qty},
+            {Label: 'Price', Value: price}
+        ],
+    },
+        UI.Facets: [{
+            $Type : 'UI.ReferenceFacet',
+            ID    : 'SalAppitemsFacet',
+            Label : 'SalAppitems',
+            Target: '@UI.FieldGroup#SalAppitems',
+        }, ]
+);
+
+
+annotate nnrg.PurchaseApp.Items with {
+    productId @(
+        Common.Text: productId.product_name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Product',
+            CollectionPath: 'Product',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: productId_ID,
+                    ValueListProperty: 'ID'
+                },
+
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'product_name'
+                },
+            ]
+        }
+    );
+};
+
+
+annotate nnrg.SalesApp.Items with {
+    productId @(
+        Common.Text: productId.product_name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Product',
+            CollectionPath: 'Product',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: productId_ID,
+                    ValueListProperty: 'ID'
+                },
+
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'product_name'
+                },
+            ]
+        }
+    );
+};
+
+annotate nnrg.Store with {
+    state @(
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'State',
+            CollectionPath: 'States',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: state_code,
+                    ValueListProperty: 'code'
+                },
+
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'description'
+                },
+            ]
+        }
+    );
+};
+
+
+
+annotate nnrg.Stock with {
+    storeId   @(
+        Common.Text: storeId.store_id,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Store id',
+            CollectionPath: 'Store',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: storeId_ID,
+                    ValueListProperty: 'ID'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'name'
                 },
 
             ]
         }
     );
     productId @(
-        Common.Text: productId.ProductID,
+        Common.Text: productId.product_id,
         Common.TextArrangement: #TextOnly,
         Common.ValueListWithFixedValues: true,
         Common.ValueList               : {
             Label         : 'Product id',
-            CollectionPath: 'Products',
+            CollectionPath: 'Product',
             Parameters    : [
                 {
                     $Type            : 'Common.ValueListParameterInOut',
@@ -327,7 +696,7 @@ annotate nnrg.Stock with {
                 },
                 {
                     $Type            : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'ProductName'
+                    ValueListProperty: 'product_name'
                 },
 
             ]
@@ -336,185 +705,72 @@ annotate nnrg.Stock with {
 }
 
 
-annotate nnrg.PurchaseOrder.items with @(
-    UI.LineItem: [
-        {
-            Value: product_id_ID,
-        },
-        {
-            Value: qty,
-        },
-        {
-            Value: price_ID,
-        },
-        {
-            Value: store_id_ID,
-        },
-    ],
-    UI.FieldGroup #PurchaseOrderItem: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-                {
-                $Type: 'UI.DataField',
-                Value: product_id_ID,
-                },
-                {
-                $Type: 'UI.DataField',
-                Value: qty,
-                },
-            {
-                $Type: 'UI.DataField',
-                Value: price_ID,
-                },
-                {
-                $Type: 'UI.DataField',
-                Value: store_id_ID,
-                },
-
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'PurchaseOrderItemFacet',
-            Label: 'Purchase Order item',
-            Target: '@UI.FieldGroup#PurchaseOrderItem'
-        },
-    ]
-);
-
-annotate nnrg.PurchaseOrder with @(
-    UI.LineItem: [
-            {
-            $Type: 'UI.DataField',
-            Value: purchaseOrderNumber
-            },
-            {
-            $Type: 'UI.DataField',
-            Value: businessPartner_ID
-            },
-            {
-            $Type: 'UI.DataField',
-            Value: purchaseOrderDate
-            }
-    ],
-    UI.FieldGroup #PurchaseOrderHeader: {
-        $Type: 'UI.FieldGroupType',
-        Data: [
-                {
-                $Type: 'UI.DataField',
-                Value: purchaseOrderNumber
-                },
-                {
-                $Type: 'UI.DataField',
-                Value: businessPartner_ID
-                },
-                {
-                $Type: 'UI.DataField',
-                Value: purchaseOrderDate
-                }
-        ]
-    },
-    UI.Facets: [
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'PurchaseOrderHeaderFacet',
-            Label: 'Purchase Order Header',
-            Target: '@UI.FieldGroup#PurchaseOrderHeader'
-        },
-        {
-            $Type: 'UI.ReferenceFacet',
-            ID: 'PurchaseOrderItems',
-            Label: 'Purchase Order Items',
-            Target: 'items/@UI.LineItem',
-        },
-    ]
-);
-
-annotate nnrg.PurchaseOrder.items with {
-    product_id @(
-        Common.ValueListWithFixedValues: true,
-        Common.ValueList: {
-            Label: 'Product List',
-            CollectionPath: 'Products',
-            Parameters: [
-                {
-                    $Type: 'Common.ValueListParameterInOut',
-                    LocalDataProperty: product_id_ID,
-                    ValueListProperty: 'ID'
-                },
-                {
-                    $Type: 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'ProductName'
-                },
-                
-                    ]
-        }
-                );
-        store_id @(
-        Common.ValueListWithFixedValues: true,
-        Common.ValueList: {
-            Label: 'Store List',
-            CollectionPath: 'Stores',
-            Parameters: [
-                {
-                    $Type: 'Common.ValueListParameterInOut',
-                    LocalDataProperty: store_id_ID,
-                    ValueListProperty: 'ID'
-                },
-                {
-                    $Type: 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'Name'
-                },
-            ]
-        }
-    );
-    price @(
-        Common.ValueListWithFixedValues: true,
-        Common.ValueList: {
-            Label: 'Price List',
-            CollectionPath: 'Products',
-            Parameters: [
-                {
-                    $Type: 'Common.ValueListParameterInOut',
-                    LocalDataProperty: price_ID,
-                    ValueListProperty: 'ID'
-                },
-                {
-                    $Type: 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'ProductName'
-                },
-                {
-                    $Type: 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'SellPrice'
-                },
-            ]
-        }
-    );
-};
-
-annotate nnrg.PurchaseOrder with {
-    businessPartner@(
-        Common.Text: businessPartner.Name,
+annotate nnrg.Items with {
+    storeId   @(
+        Common.Text: storeId.name,
         Common.TextArrangement: #TextOnly,
         Common.ValueListWithFixedValues: true,
         Common.ValueList               : {
-            Label         : 'businessPartner',
-            CollectionPath: 'BusinessPartners',
+            Label         : 'Store id',
+            CollectionPath: 'Store',
             Parameters    : [
                 {
                     $Type            : 'Common.ValueListParameterInOut',
-                    LocalDataProperty: businessPartner_ID,
+                    LocalDataProperty: storeId_ID,
                     ValueListProperty: 'ID'
                 },
                 {
                     $Type            : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty: 'Name'
+                    ValueListProperty: 'name'
                 },
 
             ]
         }
     );
-};
+    productId @(
+        Common.Text: productId.product_name,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Product id',
+            CollectionPath: 'Product',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: productId_ID,
+                    ValueListProperty: 'ID'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'product_name'
+                },
 
+            ]
+        }
+    );
+    price     @(
+        Common.Text: price.product_sell,
+        Common.TextArrangement: #TextOnly,
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList               : {
+            Label         : 'Price',
+            CollectionPath: 'Product',
+            Parameters    : [
+                {
+                    $Type            : 'Common.ValueListParameterInOut',
+                    LocalDataProperty: price_ID,
+                    ValueListProperty: 'ID'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'product_sell'
+                },
+                {
+                    $Type            : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'product_name'
+                },
 
+            ]
+        }
+    );
+}

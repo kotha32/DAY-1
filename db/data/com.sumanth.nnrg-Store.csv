@@ -1,4 +1,4 @@
-ID,StoreID,Name,Address1,Address2,City,PINCode
+ID,store_id,name,add1,add2,city,pinCode
 8fcade7e-2624-4893-8155-dafdaf3ff4db,S001,Electronics Hub,123 Tech Street,Suite 100,Tech City,500072
 2c0fae26-351a-4b5b-b1c6-8c1c7363a644,S002,Gadget World,456 Gadget Lane,Building 5,Innovate Town,560034
 ba2ac491-58b0-4054-a559-b66ed3aed674,S003,Digital Den,789 Digital Ave,Floor 2,Cyber City,400076
